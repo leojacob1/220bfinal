@@ -2,21 +2,19 @@ SndBuf bufLock => PitShift shiftLock => LPF lpf => dac;
 SndBuf bufPots => Gain gainPots => dac;
 SndBuf bufKick[16];
 Gain gainKick => Gain gainKickMaster;
-Gain gainKickBpf => BPF bpfKick => HPF hpfKick => HPF hpfKick2 => gainKickMaster;
+Gain gainKickBpf => BPF bpfKick => gainKickMaster;
 gainKickMaster => dac;
 
 0.6 => bufPots.gain;
 
 50 => bpfKick.Q;
-400 => hpfKick.freq;
-400 => hpfKick2.freq;
 
 for (int i; i < 16; i++) {
   bufKick[i] => gainKick;
   bufKick[i] => gainKickBpf;
   me.dir() + "kick.wav" => bufKick[i].read;
   bufKick[i].samples() => bufKick[i].pos;
-  6 => bufKick[i].gain;
+  9 => bufKick[i].gain;
 }
 
 
@@ -98,7 +96,7 @@ fun runPad() {
           } else if (pad == 49) {
             velocity / 127.0 => gainKickMaster.gain;
           } else if (pad == 50) {
-            1.0 - (velocity / 127.0) / 2.0 => gainKick.gain;
+            (1.0 - (velocity / 127.0)) / 2.0 => gainKick.gain;
             velocity / 127.0 => gainKickBpf.gain;
             <<< velocity, gainKick.gain(), gainKickBpf.gain() >>>;
           } else if (inputType == SLIDER && pad == 51) {
