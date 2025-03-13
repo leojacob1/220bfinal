@@ -80,6 +80,8 @@ fun playManual(int pad) {
 }
 
 fun runPad() {
+  Shred manualSh;
+  int activeManualPad;
   while (true) {
     min => now;
     while (min.recv(msg)) {
@@ -89,7 +91,12 @@ fun runPad() {
 
         // Light it up green at high brightness
         if (inputType == NOTE_ON && isManual && 56 <= pad && 64 > pad) {
-          spork ~ playManual(pad);
+          if (manualSh.id()) {
+            Machine.remove(manualSh.id());
+            mout.send(144, activeManualPad, 0);
+          }
+          pad => activeManualPad;
+          spork ~ playManual(pad) @=> manualSh;
         } else if (inputType == SLIDER) {
           if (pad == 48) {
             velocity / 127.0 => gainPots.gain;
@@ -98,11 +105,8 @@ fun runPad() {
           } else if (pad == 50) {
             (1.0 - (velocity / 127.0)) / 2.0 => gainKick.gain;
             velocity / 127.0 => gainKickBpf.gain;
-            <<< velocity, gainKick.gain(), gainKickBpf.gain() >>>;
           } else if (inputType == SLIDER && pad == 51) {
             50.0 + (velocity / 127.0 * 1950.0) => bpfKick.freq;
-            <<< "freq", bpfKick.freq() >>>;
-
           }
         } else if (0 <= pad && pad < 64) {
           if (!padState[pad] && inputType == NOTE_ON) {
