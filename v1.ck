@@ -15,12 +15,16 @@ for (int i; i < 16; i++) {
   bufKick[i] => gainKick;
   bufKick[i] => gainKickBpf;
   me.dir() + "kick.wav" => bufKick[i].read;
+  bufKick[i].samples() => bufKick[i].pos;
   6 => bufKick[i].gain;
 }
 
 
 me.dir() + "lock.wav" => bufLock.read;
 me.dir() + "pots.wav" => bufPots.read;
+
+bufLock.samples() => bufLock.pos;
+bufPots.samples() => bufPots.pos;
 
 5000 => lpf.freq;
 
