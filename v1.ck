@@ -138,10 +138,7 @@ fun runPad() {
             1 => isDoubleKick;
             mout.send(144, 83, 3);
           }
-        }
-
-        10::ms => now;
-        
+        }        
     }
   }
 }
